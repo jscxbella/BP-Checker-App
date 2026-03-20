@@ -1,0 +1,172 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>SereniTea Health</title>
+  <link rel="manifest" href="manifest.json" />
+  <link rel="icon" href="icon-192.png" />
+  <style>
+    :root {
+      --matcha-green: #90ee90;
+      --cream: #f5f5dc;
+      --dark-green: #4a7c4a;
+      --text-color: #2f4f2f;
+    }
+    body {
+      margin: 0;
+      font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+      background-color: var(--cream);
+      color: var(--text-color);
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      padding: 1rem;
+      min-height: 100vh;
+    }
+    h1 {
+      color: var(--dark-green);
+      margin-bottom: 1rem;
+    }
+    label {
+      display: block;
+      margin-top: 1rem;
+      font-weight: bold;
+    }
+    input, button {
+      margin-top: 0.3rem;
+      padding: 0.5rem;
+      border: 2px solid var(--matcha-green);
+      border-radius: 5px;
+      width: 100%;
+      max-width: 300px;
+      font-size: 1rem;
+      box-sizing: border-box;
+    }
+    button {
+      background-color: var(--matcha-green);
+      color: white;
+      border: none;
+      cursor: pointer;
+      margin-top: 1.5rem;
+      font-weight: bold;
+      transition: background-color 0.3s ease;
+    }
+    button:hover {
+      background-color: var(--dark-green);
+    }
+    #alert {
+      margin-top: 1rem;
+      font-weight: bold;
+      padding: 0.7rem;
+      border-radius: 5px;
+      max-width: 300px;
+      text-align: center;
+      display: none;
+    }
+    #alert.diabetic {
+      background-color: #ffcccc;
+      color: #cc0000;
+      border: 2px solid #cc0000;
+    }
+    #alert.normal {
+      background-color: #ccffcc;
+      color: #006600;
+      border: 2px solid #006600;
+    }
+    #resultDisplay {
+      margin-top: 1.5rem;
+      padding: 1rem;
+      border: 1px solid var(--dark-green);
+      border-radius: 8px;
+      background-color: white;
+      width: 100%;
+      max-width: 350px;
+      box-shadow: 0 2px 5px rgba(0,0,0,0.1);
+      display: none; 
+    }
+    #resultDisplay p {
+      margin: 0.5rem 0;
+      font-size: 0.95rem;
+    }
+    #resultDisplay p strong {
+      color: var(--dark-green);
+    }
+  </style>
+</head>
+<body>
+  <h1>BP Check</h1>
+  <form id="healthForm">
+    <label for="patientName">Patient Name:</label>
+    <input type="text" id="patientName" name="patientName" required placeholder="Enter your name" />
+
+    <label for="doctor">Doctor's Name:</label>
+    <input type="text" id="doctor" name="doctor" required placeholder="Enter doctor's name" />
+
+    <label for="sugarLevel">Sugar Level:</label>
+    <input type="number" step="0.1" id="sugarLevel" name="sugarLevel" required placeholder="Enter sugar level" min="0" />
+
+    <button type="submit">Check</button>
+  </form>
+
+  <div id="alert"></div>
+  <div id="resultDisplay">
+    <p><strong>Patient Name:</strong> <span id="displayName"></span></p>
+    <p><strong>Doctor:</strong> <span id="displayDoctor"></span></p>
+    <p><strong>Sugar Level:</strong> <span id="displaySugar"></span></p>
+    <p><strong>Status:</strong> <span id="displayStatus"></span></p>
+  </div>
+
+  <script>
+    const form = document.getElementById('healthForm');
+    const alertBox = document.getElementById('alert');
+    const resultDisplay = document.getElementById('resultDisplay');
+    const displayName = document.getElementById('displayName');
+    const displayDoctor = document.getElementById('displayDoctor');
+    const displaySugar = document.getElementById('displaySugar');
+    const displayStatus = document.getElementById('displayStatus');
+
+    form.addEventListener('submit', e => {
+      e.preventDefault();
+
+      const patientName = form.patientName.value;
+      const doctorName = form.doctor.value;
+      const sugarLevel = parseFloat(form.sugarLevel.value);
+
+      let statusMessage = '';
+      let statusClass = '';
+
+      if (sugarLevel > 5) {
+        statusMessage = "Diabetic ka! Taas imo sugar level. Please consult your doctor.";
+        statusClass = 'diabetic';
+      } else {
+        statusMessage = "Mayad kay normal lang imo sugar level. Stay healthy and kaon sholet!";
+        statusClass = 'normal';
+      }
+
+      alertBox.textContent = statusMessage;
+      alertBox.className = statusClass;
+      alertBox.style.display = 'block';
+
+      displayName.textContent = patientName;
+      displayDoctor.textContent = doctorName;
+      displaySugar.textContent = sugarLevel;
+      displayStatus.textContent = statusMessage;
+
+      const statusSpan = document.getElementById('displayStatus');
+      statusSpan.className = statusClass; 
+
+      resultDisplay.style.display = 'block'; 
+    });
+
+
+    if ('serviceWorker' in navigator) {
+      window.addEventListener('load', () => {
+        navigator.serviceWorker.register('serviceworker.js')
+          .then(reg => console.log('Service Worker registered.', reg))
+          .catch(err => console.log('Service Worker registration failed:', err));
+      });
+    }
+  </script>
+</body>
+</html>
